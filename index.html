@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LION'S FANGS & ZEBRA BLOODLINES - OPTIMIZED EDITION</title>
+    <!-- PeerJS Library -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <!-- Retro Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; font-family: 'Press Start 2P', 'Kanit', sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 10px; 
+            touch-action: manipulation;
+            position: relative;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+        }
+
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .title-container { 
+            text-align: center; 
+            margin-bottom: 8px; 
+            z-index: 3; 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .banner-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(120, 53, 15, 0.92);
+            padding: 8px 20px;
+            border: 4px solid #fef08a;
+            border-radius: 12px;
+            box-shadow: 0 6px 0 #000, 0 0 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .banner-title {
+            color: #fef08a;
+            font-size: 14px;
+            text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            letter-spacing: 1px;
+            line-height: 1.25;
+        }
+
+        .banner-subtitle {
+            background: #dc2626;
+            color: #fff;
+            font-size: 8px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            border: 2px solid #000;
+            margin-top: 4px;
+            box-shadow: 0 3px 0 #000;
+        }
+
+        .mascot-icon {
+            width: 38px;
+            height: 38px;
+            image-rendering: pixelated;
+            filter: drop-shadow(2px 2px 0 #000);
+        }
+
+        .card { 
+            background: rgba(30, 41, 59, 0.95); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 4px solid #facc15; 
+            width: 100%; 
+            max-width: 500px; 
+            text-align: center; 
+            color: #fff; 
+            box-shadow: 0 8px 0 #000; 
+            z-index: 3;
+            backdrop-filter: blur(4px);
+        }
+        .card h2 { font-size: 11px; color: #f8fafc; text-shadow: 2px 2px 0 #000; margin-bottom: 10px; }
+        
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 3px solid #475569; background: #0f172a; color: #facc15; text-align: center; font-size: 10px; outline: none; }
+        input:focus { border-color: #facc15; }
+
+        button { width: 100%; padding: 12px 16px; font-size: 10px; border: none; border-radius: 8px; cursor: pointer; background: #eab308; color: #000; margin: 6px 0; font-weight: bold; box-shadow: 0 4px 0 #a16207; transition: transform 0.1s; }
+        button:hover { background: #facc15; }
+        button:active { transform: translateY(2px); box-shadow: 0 2px 0 #a16207; }
+        button:disabled { background: #64748b; box-shadow: 0 4px 0 #334155; cursor: not-allowed; opacity: 0.7; color: #94a3b8; }
+        
+        .btn-success { background: #22c55e; color: #fff; box-shadow: 0 4px 0 #15803d; } 
+        .btn-success:hover { background: #4ade80; }
+
+        .player-list { list-style: none; margin: 12px 0; max-height: 140px; overflow-y: auto; background: #0f172a; padding: 8px; border-radius: 8px; text-align: left; border: 2px solid #334155; }
+        .player-list li { padding: 6px 8px; border-bottom: 1px solid #1e293b; color: #38bdf8; font-size: 9px; display: flex; justify-content: space-between; align-items: center; }
+        .player-info { display: flex; align-items: center; gap: 8px; font-family: 'Kanit'; font-weight: 800; }
+        .player-avatar { width: 26px; height: 26px; border-radius: 4px; background: #1e293b; border: 2px solid #38bdf8; image-rendering: pixelated; }
+
+        .share-box { background: #0f172a; padding: 8px; border-radius: 6px; border: 2px solid #334155; margin: 8px 0; word-break: break-all; font-size: 8px; color: #94a3b8; font-family: monospace; }
+
+        #game-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 630px; z-index: 3; }
+        
+        #mario-hud { 
+            width: 100%; 
+            background: #3b82f6; 
+            border: 4px solid #000; 
+            border-bottom: none; 
+            padding: 8px 14px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 9px; 
+            color: #fff; 
+            text-shadow: 2px 2px 0 #000; 
+            border-radius: 10px 10px 0 0;
+            box-shadow: inset 0 3px 0 rgba(255,255,255,0.4);
+        }
+        .hud-item { display: flex; align-items: center; gap: 5px; }
+
+        #game-container { 
+            position: relative; 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            border: 4px solid #000; 
+            border-radius: 0 0 10px 10px; 
+            overflow: hidden; 
+            display: none; 
+            background: #000; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7); 
+        }
+        canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+        
+        #live-leaderboard {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            border: 3px solid #facc15;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
+            font-family: 'Kanit', sans-serif;
+            display: none;
+        }
+
+        #live-leaderboard h4 {
+            font-size: 10px;
+            color: #facc15;
+            text-align: center;
+            margin-bottom: 6px;
+            font-family: 'Press Start 2P', sans-serif;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0 #000;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 4px;
+        }
+
+        .live-lb-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+
+        .live-lb-item {
+            flex: 1 1 calc(50% - 6px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 41, 59, 0.9);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid #334155;
+            min-width: 140px;
+        }
+
+        .live-lb-item.is-me {
+            background: #0284c7;
+            border-color: #facc15;
+            color: #fff;
+        }
+
+        .live-lb-pinfo {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .live-lb-rank {
+            color: #facc15;
+            font-weight: 900;
+            font-size: 10px;
+            width: 14px;
+            text-align: center;
+        }
+
+        .live-lb-avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            background: #0f172a;
+            border: 1px solid #fff;
+            flex-shrink: 0;
+            image-rendering: pixelated;
+        }
+
+        .live-lb-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80px;
+        }
+
+        .live-lb-score {
+            color: #4ade80;
+            font-weight: 900;
+            font-size: 10px;
+            margin-left: 4px;
+            flex-shrink: 0;
+        }
+
+        #mobile-controls { display: none; margin-top: 12px; width: 220px; height: 160px; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; }
+        .d-btn { 
+            background: rgba(30, 41, 59, 0.9); 
+            border: 3px solid #facc15; 
+            border-radius: 10px; 
+            color: #facc15; 
+            font-size: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            -webkit-tap-highlight-color: transparent; 
+            box-shadow: 0 4px 0 #000; 
+            touch-action: none;
+        }
+        .d-btn:active { background: #facc15; color: #000; transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+        #btn-up { grid-column: 2; grid-row: 1; }
+        #btn-left { grid-column: 1; grid-row: 2; }
+        #btn-right { grid-column: 3; grid-row: 2; }
+        #btn-down { grid-column: 2; grid-row: 3; }
+
+        @media (max-width: 1024px), (pointer: coarse) {
+            #mobile-controls { display: grid; }
+            .card, .banner-header, #live-leaderboard { backdrop-filter: none !important; }
+        }
+
+        .overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; z-index: 10; color: #fff; font-family: 'Kanit', sans-serif; }
+        .hidden { display: none !important; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; background: #0f172a; border-radius: 8px; overflow: hidden; font-family: 'Kanit'; }
+        th, td { border: 1px solid #334155; padding: 6px; text-align: center; font-weight: 800; vertical-align: middle; }
+        th { background: #1e293b; color: #facc15; }
+        .my-row { background: #0284c7 !important; color: #facc15; }
+        
+        .table-avatar { width: 20px; height: 20px; border-radius: 4px; vertical-align: middle; background: #1e293b; border: 1px solid #fff; margin-right: 4px; image-rendering: pixelated; }
+
+        .spinner { border: 4px solid #334155; border-top: 4px solid #facc15; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; margin-bottom: 12px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #fade-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85); z-index: 9999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: #fff; text-align: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out; padding: 20px; font-family: 'Kanit';
+        }
+        #fade-overlay.active { opacity: 1; pointer-events: auto; }
+        .rules-card { background: #1e293b; border: 3px solid #facc15; border-radius: 12px; padding: 20px; max-width: 450px; width: 90%; box-shadow: 0 0 20px rgba(250, 204, 21, 0.3); }
+        .rules-card h2 { font-size: 18px; color: #facc15; font-weight: 900; margin-bottom: 12px; }
+        .rules-card ul { text-align: left; margin: 12px 0; font-size: 12px; line-height: 1.8; color: #e2e8f0; font-weight: 600; list-style: none; }
+        .countdown-num { font-size: 30px; font-weight: 900; color: #facc15; margin-top: 8px; }
+
+        .quiz-timer-bar-bg { width: 100%; height: 8px; background: #0f172a; border-radius: 4px; margin: 10px 0; overflow: hidden; border: 1px solid #334155; }
+        .quiz-timer-bar-fill { height: 100%; background: #facc15; width: 100%; transition: width 0.1s linear; }
+
+        #death-toast {
+            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+            background: #ef4444; color: #fff; padding: 6px 14px; border-radius: 12px;
+            font-weight: 900; font-size: 11px; z-index: 5; border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s; pointer-events: none; font-family: 'Kanit';
+        }
+        #death-toast.show { opacity: 1; }
+
+        #grace-banner {
+            position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+            background: #0284c7; color: #fff; padding: 6px 12px; border-radius: 12px;
+            font-weight: 900; font-size: 10px; z-index: 5; border: 2px solid #38bdf8;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s; pointer-events: none; font-family: 'Kanit';
+        }
+        #grace-banner.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <video id="bg-video" autoplay loop muted playsinline preload="auto">
+        <source src="vido.mp4" type="video/mp4">
+    </video>
+
+    <div class="title-container">
+        <div class="banner-header">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=lion_left&backgroundColor=f97316" class="mascot-icon" alt="Lion">
+            <div>
+                <div class="banner-title">LION'S FANGS<br>& ZEBRA BLOODLINES</div>
+                <div class="banner-subtitle">MARIO SAVANNAH MAZE EDITION</div>
+            </div>
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=zebra_right&backgroundColor=38bdf8" class="mascot-icon" alt="Zebra">
+        </div>
+    </div>
+
+    <div id="lobby-screen" class="card">
+        <h2>🎮 ROOM LOBBY (<span id="player-count" style="color: #38bdf8;">0</span>/20)</h2>
+        <input type="text" id="username" placeholder="ตั้งชื่อม้าลายสุดเก๋า..." maxlength="10">
+
+        <div id="host-panel">
+            <button id="create-btn" class="btn-success" onclick="createRoom()">👑 สร้างห้อง SAVANNAH</button>
+        </div>
+
+        <div id="client-panel" class="hidden">
+            <p style="color: #38bdf8; margin-bottom: 6px; font-size: 10px; font-family:'Kanit';">🔗 ชวนเข้าห้องเพื่อนแล้ว!</p>
+            <button id="join-btn" class="btn-success" onclick="joinRoomFromUrl()">🚪 เข้าร่วมเล่นเลย</button>
+        </div>
+
+        <div id="room-info" class="hidden" style="margin-top: 10px;">
+            <p style="font-size: 10px; color: #94a3b8; font-family:'Kanit'; font-weight:800;">ส่งลิงก์นี้ให้เพื่อนกดเข้าเล่น:</p>
+            <div id="share-link-display" class="share-box">กำลังสร้างลิงก์...</div>
+            <button onclick="copyInviteLink()" style="background: #475569; box-shadow: 0 4px 0 #1e293b;">📋 คัดลอกลิงก์</button>
+            <ul id="player-list-ui" class="player-list"></ul>
+            <button id="start-game-btn" class="btn-success hidden" onclick="hostStartGame()">🚀 เริ่มเกมเลย!</button>
+        </div>
+    </div>
+
+    <div id="game-wrapper">
+        <div id="mario-hud" class="hidden">
+            <div class="hud-item">
+                <img id="hud-avatar" src="" style="width:16px; height:16px; image-rendering:pixelated; border-radius:2px;" alt="Avatar">
+                <span id="hud-player-name">PLAYER 1</span>
+            </div>
+            <div class="hud-item">🪙×<span id="hud-score">00</span></div>
+            <div class="hud-item">STAGE:<span id="hud-stage">1-1</span></div>
+            <div class="hud-item">⏱️<span id="hud-timer">150</span></div>
+        </div>
+
+        <div id="game-container">
+            <div id="death-toast">💥 โดนกิน! หัก 1 คะแนน สุ่มเกิดใหม่</div>
+            <div id="grace-banner">⏳ สิงโตหยุดนิ่ง 2 วินาที! เร่งหนีเลย!</div>
+
+            <canvas id="canvas" width="630" height="630"></canvas>
+
+            <div id="quiz-modal" class="overlay hidden">
+                <h3 style="color: #facc15; margin-bottom: 4px; font-weight: 900; font-size: 16px;">❓ กล่องคำถาม ? มาริโอ้</h3>
+                <p style="font-size: 11px; color: #38bdf8; font-weight: 800;">⚡ เวลาเหลือ: <b id="quiz-timer-text">10</b>s (คะแนน: <b id="quiz-potential-score">20</b>)</p>
+                
+                <div class="quiz-timer-bar-bg">
+                    <div id="quiz-timer-bar" class="quiz-timer-bar-fill"></div>
+                </div>
+
+                <p id="quiz-text" style="margin-bottom: 12px; font-size: 13px; font-weight: 800;"></p>
+                <div id="quiz-options" style="display: flex; flex-direction: column; gap: 8px; width: 100%;"></div>
+            </div>
+
+            <div id="waiting-modal" class="overlay hidden">
+                <div class="spinner"></div>
+                <h2 style="color: #facc15; margin-bottom: 8px; font-weight: 900; font-size:18px;">🎉 เคลียร์ครบทุกด่านสำเร็จ!</h2>
+                <p style="font-size: 13px; margin-bottom: 15px; font-weight: 800;">คะแนนรวมของคุณ: <b id="final-my-score" style="color: #facc15;">0</b> / 100 คะแนน</p>
+                <p style="font-size: 11px; color: #94a3b8; background: #1e293b; padding: 10px; border-radius: 8px; border: 1px solid #334155; font-weight: 800;">
+                    ⏳ กรุณารอผู้เล่นคนอื่นเล่นจบหมดเวลา...<br>
+                    ระบบจะทำการประมวลผลประกาศอันดับสรุปพร้อมกัน!
+                </p>
+            </div>
+
+            <div id="end-modal" class="overlay hidden">
+                <h2 style="color: #facc15; margin-bottom: 5px; font-weight: 900; font-size: 18px;">🏆 สรุปผลการแข่งขัน 🏆</h2>
+                <p style="color: #38bdf8; font-size: 11px; font-weight: 800;">อันดับม้าลายสายสปีดทั้งหมด</p>
+                <div style="max-height: 200px; overflow-y: auto; width: 100%; margin-top: 10px;">
+                    <table>
+                        <thead>
+                            <tr><th>อันดับ</th><th>ผู้เล่น</th><th>ด่าน</th><th>คะแนน</th></tr>
+                        </thead>
+                        <tbody id="leaderboard-body"></tbody>
+                    </table>
+                </div>
+                <button style="margin-top: 15px;" onclick="window.location.href = window.location.pathname;">🏠 กลับหน้าหลัก</button>
+            </div>
+        </div>
+
+        <div id="live-leaderboard">
+            <h4>🏆 LIVE LEADERBOARD</h4>
+            <ul id="live-lb-list" class="live-lb-list"></ul>
+        </div>
+
+        <div id="mobile-controls">
+            <div class="d-btn" id="btn-up">▲</div>
+            <div class="d-btn" id="btn-left">◄</div>
+            <div class="d-btn" id="btn-right">►</div>
+            <div class="d-btn" id="btn-down">▼</div>
+        </div>
+    </div>
+
+    <div id="fade-overlay">
+        <div class="rules-card" id="fade-card-content">
+            <h2>📜 กติกา ZEBRA VEINS</h2>
+            <ul>
+                <li>🕳️ <b>รีบเข้าหลุม:</b> วิ่งหาทางออกสีดำเพื่อผ่านด่านให้ไวที่สุด</li>
+                <li>🦁 <b>ระวังพลังสิงโต:</b> ยิ่งอยู่นาน สิงโตจะยิ่งสปีดไวขึ้นเรื่อยๆ!</li>
+                <li>❓ <b>ตอบคำถามให้ไว:</b> คะแนนโบนัสจะลดลงเรื่อยๆ ตามเวลาที่คิด</li>
+                <li>💥 <b>การโดนกิน:</b> หากโดนกิน จะถูกหัก 1 คะแนน และสุ่มเกิดใหม่ทันที</li>
+            </ul>
+            <div class="countdown-num" id="rules-countdown">15</div>
+        </div>
+    </div>
+
+<script>
+const ZEBRA_GIF_URL = "zebra_run.gif";
+const zebraImg = new Image();
+zebraImg.src = ZEBRA_GIF_URL;
+
+let peer = null;
+let connections = [];
+let hostConn = null;
+let isHost = false;
+let myName = "";
+let playersInLobby = [];
+const MAX_PLAYERS = 20;
+
+let needsRedraw = true;
+
+const avatarCache = new Map();
+function getAvatarUrl(seed) {
+    if (!avatarCache.has(seed)) {
+        avatarCache.set(seed, `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,ffd5dc`);
+    }
+    return avatarCache.get(seed);
+}
+
+const peerConfig = {
+    config: {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+    }
+};
+
+window.onload = function() {
+    if (window.location.hash) {
+        document.getElementById('host-panel').classList.add('hidden');
+        document.getElementById('client-panel').classList.remove('hidden');
+    }
+    setupTouchControls();
+};
+
+function setupTouchControls() {
+    const bindBtn = (id, dx, dy) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        
+        el.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            movePlayer(dx, dy);
+        }, { passive: false });
+    };
+
+    bindBtn('btn-up', 0, -1);
+    bindBtn('btn-down', 0, 1);
+    bindBtn('btn-left', -1, 0);
+    bindBtn('btn-right', 1, 0);
+}
+
+function createRoom() {
+    const createBtn = document.getElementById('create-btn');
+    if (createBtn.disabled) return;
+    createBtn.disabled = true;
+    createBtn.innerText = "⏳ กำลังสร้างห้อง...";
+
+    myName = document.getElementById('username').value.trim() || "PLAYER_" + Math.floor(Math.random()*100);
+    const roomId = "zv_mario_" + Math.random().toString(36).substring(2, 8);
+
+    peer = new Peer(roomId, peerConfig);
+
+    peer.on('open', (id) => {
+        isHost = true;
+        
+        if (!playersInLobby.some(p => p.id === id)) {
+            playersInLobby.push({ id: id, name: myName, score: 0, stage: 1 });
+        }
+        
+        const inviteUrl = window.location.origin + window.location.pathname + "#" + id;
+        window.history.pushState(null, null, inviteUrl);
+
+        document.getElementById('share-link-display').innerText = inviteUrl;
+        document.getElementById('room-info').classList.remove('hidden');
+        document.getElementById('start-game-btn').classList.remove('hidden');
+        document.getElementById('host-panel').style.display = 'none';
+        updateLobbyUI();
+        updateLiveLeaderboard();
+    });
+
+    peer.on('connection', (conn) => {
+        if (playersInLobby.length >= MAX_PLAYERS) {
+            conn.send({ type: 'REJECT', msg: 'ห้องเต็มแล้ว (จำกัดสูงสุด 20 คน)' });
+            return;
+        }
+
+        connections.push(conn);
+
+        conn.on('data', (data) => {
+            if (data.type === 'JOIN') {
+                if (!playersInLobby.some(p => p.id === conn.peer)) {
+                    playersInLobby.push({ id: conn.peer, name: data.name, score: 0, stage: 1 });
+                }
+                broadcastLobbyData();
+            } else if (data.type === 'UPDATE_SCORE') {
+                let p = playersInLobby.find(item => item.id === conn.peer);
+                if (p) { p.score = data.score; p.stage = data.stage; }
+                broadcast({ type: 'LEADERBOARD_SYNC', players: playersInLobby });
+                updateLiveLeaderboard();
+            }
+        });
+
+        conn.on('close', () => {
+            connections = connections.filter(c => c.peer !== conn.peer);
+            playersInLobby = playersInLobby.filter(p => p.id !== conn.peer);
+            broadcastLobbyData();
+        });
+    });
+
+    peer.on('error', (err) => {
+        createBtn.disabled = false;
+        createBtn.innerText = "👑 สร้างห้อง SAVANNAH";
+        alert("เกิดข้อผิดพลาดในการสร้างห้อง: " + err.type);
+    });
+}
+
+function joinRoomFromUrl() {
+    const hostRoomId = window.location.hash.substring(1);
+    if (!hostRoomId) return alert("ลิงก์ห้องไม่ถูกต้อง");
+
+    const joinBtn = document.getElementById('join-btn');
+    if (joinBtn.disabled) return;
+    joinBtn.disabled = true;
+    joinBtn.innerText = "⏳ กำลังเชื่อมต่อ...";
+
+    myName = document.getElementById('username').value.trim() || "PLAYER_" + Math.floor(Math.random()*100);
+    peer = new Peer(peerConfig);
+
+    peer.on('open', () => {
+        hostConn = peer.connect(hostRoomId, { reliable: true });
+
+        hostConn.on('open', () => {
+            hostConn.send({ type: 'JOIN', name: myName });
+            document.getElementById('room-info').classList.remove('hidden');
+            document.getElementById('client-panel').style.display = 'none';
+            document.getElementById('share-link-display').innerText = window.location.href;
+        });
+
+        hostConn.on('data', (data) => {
+            if (data.type === 'LOBBY_UPDATE') {
+                playersInLobby = data.players;
+                updateLobbyUI();
+                updateLiveLeaderboard();
+            } else if (data.type === 'START_TRANSITION') {
+                triggerStartTransition();
+            } else if (data.type === 'LEADERBOARD_SYNC') {
+                playersInLobby = data.players;
+                updateLiveLeaderboard();
+                renderLeaderboard();
+            } else if (data.type === 'REJECT') {
+                alert(data.msg);
+                joinBtn.disabled = false;
+                joinBtn.innerText = "🚪 เข้าร่วมเล่นเลย";
+            }
+        });
+
+        hostConn.on('close', () => {
+            alert("หลุดการเชื่อมต่อจากห้อง");
+            window.location.href = window.location.pathname;
+        });
+    });
+
+    peer.on('error', (err) => {
+        joinBtn.disabled = false;
+        joinBtn.innerText = "🚪 เข้าร่วมเล่นเลย";
+        alert("ไม่สามารถเชื่อมต่อได้: " + err.type);
+    });
+}
+
+function copyInviteLink() {
+    const linkText = document.getElementById('share-link-display').innerText;
+    navigator.clipboard.writeText(linkText);
+    alert("คัดลอกลิงก์ชวนเพื่อนเรียบร้อยแล้ว!");
+}
+
+function broadcast(data) {
+    connections.forEach(conn => {
+        if(conn.open) conn.send(data);
+    });
+}
+
+function broadcastLobbyData() {
+    updateLobbyUI();
+    updateLiveLeaderboard();
+    broadcast({ type: 'LOBBY_UPDATE', players: playersInLobby });
+}
+
+function updateLobbyUI() {
+    document.getElementById('player-count').innerText = playersInLobby.length;
+    const ul = document.getElementById('player-list-ui');
+    
+    ul.innerHTML = playersInLobby.map(p => `
+        <li>
+            <div class="player-info">
+                <img src="${getAvatarUrl(p.name)}" class="player-avatar" alt="avatar">
+                <span>${p.name}</span>
+            </div>
+            <span style="font-size:9px; color:#38bdf8">${p.id === (peer ? peer.id : '') ? '(คุณ)' : ''}</span>
+        </li>
+    `).join('');
+}
+
+function updateLiveLeaderboard() {
+    const liveList = document.getElementById('live-lb-list');
+    if (!liveList) return;
+
+    const sorted = [...playersInLobby].sort((a, b) => b.score - a.score);
+
+    liveList.innerHTML = sorted.map((p, index) => {
+        const isMe = p.id === (peer ? peer.id : '');
+        return `
+            <li class="live-lb-item ${isMe ? 'is-me' : ''}">
+                <div class="live-lb-pinfo">
+                    <span class="live-lb-rank">${index + 1}</span>
+                    <img src="${getAvatarUrl(p.name)}" class="live-lb-avatar" alt="avatar">
+                    <span class="live-lb-name">${p.name}</span>
+                </div>
+                <span class="live-lb-score">${p.score}pt</span>
+            </li>
+        `;
+    }).join('');
+}
+
+function hostStartGame() {
+    if (!isHost) return;
+    broadcast({ type: 'START_TRANSITION' });
+    triggerStartTransition();
+}
+
+function triggerStartTransition() {
+    const fadeOverlay = document.getElementById('fade-overlay');
+    fadeOverlay.classList.add('active');
+
+    let count = 15;
+    const countdownEl = document.getElementById('rules-countdown');
+    countdownEl.innerText = count;
+
+    const timer = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownEl.innerText = count;
+        } else {
+            clearInterval(timer);
+            fadeOverlay.classList.remove('active');
+            startGameLocal();
+        }
+    }, 1000);
+}
+
+function generateSingleMaze(width = 21, height = 21) {
+    let grid = Array.from({ length: height }, () => Array(width).fill(1));
+
+    function walk(x, y) {
+        grid[y][x] = 0;
+        let dirs = [[0, -2], [0, 2], [-2, 0], [2, 0]].sort(() => Math.random() - 0.5);
+        for (let [dx, dy] of dirs) {
+            let nx = x + dx, ny = y + dy;
+            if (nx > 0 && nx < width - 1 && ny > 0 && ny < height - 1 && grid[ny][nx] === 1) {
+                grid[y + dy / 2][x + dx / 2] = 0;
+                walk(nx, ny);
+            }
+        }
+    }
+    walk(1, 1);
+
+    const corners = [
+        { x: 1, y: 1 },
+        { x: width - 2, y: 1 },
+        { x: width - 2, y: height - 2 },
+        { x: 1, y: height - 2 }
+    ];
+
+    corners.forEach(c => {
+        grid[c.y][c.x] = 0;
+        if (c.y > 1) grid[c.y - 1][c.x] = 0;
+        if (c.y < height - 2) grid[c.y + 1][c.x] = 0;
+        if (c.x > 1) grid[c.x][c.x - 1] = 0;
+        if (c.x < width - 2) grid[c.x][c.x + 1] = 0;
+    });
+
+    let extraCuts = 0;
+    while (extraCuts < 22) {
+        let rx = Math.floor(Math.random() * (width - 2)) + 1;
+        let ry = Math.floor(Math.random() * (height - 2)) + 1;
+        if (grid[ry][rx] === 1) {
+            let openNeighbors = 0;
+            if (ry > 0 && grid[ry - 1][rx] === 0) openNeighbors++;
+            if (ry < height - 1 && grid[ry + 1][rx] === 0) openNeighbors++;
+            if (rx > 0 && grid[ry][rx - 1] === 0) openNeighbors++;
+            if (rx < width - 1 && grid[ry][rx + 1] === 0) openNeighbors++;
+            
+            if (openNeighbors >= 2) {
+                grid[ry][rx] = 0;
+                extraCuts++;
+            }
+        }
+    }
+
+    const numExits = Math.random() < 0.5 ? 2 : 3;
+    let possibleExits = [];
+    for (let r = 2; r < height - 2; r++) {
+        for (let c = 2; c < width - 2; c++) {
+            if (grid[r][c] === 0) {
+                let distToCorners = corners.map(cn => Math.hypot(c - cn.x, r - cn.y));
+                if (Math.min(...distToCorners) > 4) {
+                    possibleExits.push({ x: c, y: r });
+                }
+            }
+        }
+    }
+    possibleExits.sort(() => Math.random() - 0.5);
+    let exits = possibleExits.slice(0, numExits);
+
+    return { grid: grid, exits: exits };
+}
+
+let mazePool = [];
+function init10MazePool() {
+    mazePool = [];
+    for (let i = 0; i < 10; i++) {
+        mazePool.push(generateSingleMaze(21, 21));
+    }
+}
+
+const rawQuizList = [
+    { q: "1. ไขมันชนิดใดถือเป็น 'ไขมันดี' ช่วยลดคอเลสเตอรอล?", a: ["HDL", "LDL", "Trans Fat", "Triglyceride"], c: 0 },
+    { q: "2. ไขมัน 1 กรัม ให้พลังงานกี่กิโลแคลอรี (kcal)?", a: ["9 kcal", "4 kcal", "7 kcal", "12 kcal"], c: 0 },
+    { q: "3. อาหารประเภทใดมักมี 'ไขมันทรานส์' สูง?", a: ["โดนัท/เค้กมาการีน", "อกไก่ต้ม", "ผักสลัดสด", "ปลาแซลมอน"], c: 0 },
+    { q: "4. การออกกำลังกายแบบใดช่วยสลายไขมันสะสมได้ดีที่สุด?", a: ["คาร์ดิโอต่อเนื่อง 30 นาทีขึ้นไป", "การนอนหลับพักผ่อน", "การนั่งสมาธิ", "การยกน้ำหนัก 1 ครั้ง"], c: 0 },
+    { q: "5. ภาวะไขมันอุดตันในหลอดเลือดเสี่ยงต่อโรคใดมากที่สุด?", a: ["โรคหัวใจขาดเลือด/หลอดเลือดสมอง", "โรคผมร่วง", "โรคตาบอดสี", "โรคภูมิแพ้อากาศ"], c: 0 },
+    { q: "6. น้ำมันชนิดใดมีกรดไขมันไม่อิ่มตัวสูง เหมาะแก่การปรุงอาหารสุขภาพ?", a: ["น้ำมันมะกอก", "น้ำมันจากสัตว์", "เนยแท้", "เนยขาว"], c: 0 },
+    { q: "7. การกินอาหารที่มีคอเลสเตอรอลสูงเกินไป ส่งผลอย่างไรต่อหลอดเลือด?", a: ["หลอดเลือดตีบและแข็งตัว", "หลอดเลือดขยายใหญ่ขึ้น", "เลือดใสขึ้น", "ไม่มีผลใดๆ"], c: 0 },
+    { q: "8. ไขมันส่วนเกินมักไปสะสมที่ใดแล้วอันตรายที่สุด?", a: ["ในช่องท้อง (Visceral Fat)", "ที่ติ่งหู", "ที่ฝ่ามือ", "ที่เส้นผม"], c: 0 },
+    { q: "9. ระดับคอเลสเตอรอลรวมในเลือดไม่ควรเกินเท่าใด?", a: ["200 mg/dL", "300 mg/dL", "400 mg/dL", "500 mg/dL"], c: 0 },
+    { q: "10. กรดไขมันโอเมก้า-3 พบมากในอาหารประเภทใด?", a: ["ปลาทะเลน้ำลึก", "เนื้อหมูติดมัน", "ขนมปังขาว", "น้ำอัดลม"], c: 0 }
+];
+
+let shuffledQuizList = [];
+
+function shuffleArray(arr) {
+    let array = [...arr];
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+let canvas, ctx;
+let currentStage = 0;
+let currentMapIndex = 0;
+let score = 0;
+let gameTimer = 150;
+let timerInterval = null;
+let lionTimeoutId = null;
+let gameActive = false;
+let isLionFrozen = false;
+let graceTimeout = null;
+
+let stageStartTime = 0;
+const BASE_LION_SPEED = 260;
+let currentLionSpeed = 260;
+
+let player = { x: 1, y: 1 };
+let ghosts = [];
+let exits = [];
+let grid = [];
+
+let quizTimeLeft = 10;
+let quizTimerInterval = null;
+let animFrameId = null;
+
+let offscreenCanvas = document.createElement('canvas');
+let offscreenCtx = offscreenCanvas.getContext('2d');
+offscreenCanvas.width = 630;
+offscreenCanvas.height = 630;
+
+function clearAllTimers() {
+    if (lionTimeoutId) clearTimeout(lionTimeoutId);
+    if (graceTimeout) clearTimeout(graceTimeout);
+    if (quizTimerInterval) clearInterval(quizTimerInterval);
+    // เอา if (timerInterval) clearInterval(timerInterval); ออกจากตรงนี้
+}
+
+function startGameLocal() {
+    document.getElementById('lobby-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+    document.getElementById('live-leaderboard').style.display = 'block';
+    document.getElementById('mario-hud').classList.remove('hidden');
+
+    document.getElementById('hud-player-name').innerText = myName.toUpperCase();
+    document.getElementById('hud-avatar').src = getAvatarUrl(myName);
+
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d');
+
+    currentStage = 0;
+    score = 0;
+    gameTimer = 150;
+
+    init10MazePool();
+    shuffledQuizList = shuffleArray(rawQuizList);
+
+    loadStage(currentStage);
+    updateLiveLeaderboard();
+
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        if (!gameActive && document.getElementById('waiting-modal').classList.contains('hidden')) return;
+        gameTimer--;
+        document.getElementById('hud-timer').innerText = gameTimer;
+        if (gameTimer <= 0) {
+            triggerGameEndTransition();
+        }
+    }, 1000);
+
+    window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener('keydown', handleKeyPress);
+
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    
+    function animateLoop() {
+        if (needsRedraw) {
+            renderBoard();
+            needsRedraw = false;
+        }
+        animFrameId = requestAnimationFrame(animateLoop);
+    }
+    needsRedraw = true;
+    animateLoop();
+}
+
+function loadStage(stageIdx) {
+    if (stageIdx >= 5) {
+        finishAllStages();
+        return;
+    }
+
+    currentMapIndex = (stageIdx * 2) % mazePool.length;
+    applyMapSetup(currentMapIndex);
+
+    document.getElementById('hud-stage').innerText = ` 1-${stageIdx + 1}`;
+    document.getElementById('hud-score').innerText = score < 10 ? '0' + score : score;
+    gameActive = true;
+    
+    scheduleLionMove();
+}
+
+function triggerGracePeriod() {
+    isLionFrozen = true;
+    const banner = document.getElementById('grace-banner');
+    banner.classList.add('show');
+
+    if (graceTimeout) clearTimeout(graceTimeout);
+    graceTimeout = setTimeout(() => {
+        isLionFrozen = false;
+        banner.classList.remove('show');
+        needsRedraw = true;
+    }, 2000);
+}
+
+function applyMapSetup(mapIdx) {
+    const data = mazePool[mapIdx];
+    grid = data.grid;
+    exits = data.exits;
+
+    const fairPairs = [
+        { p: { x: 1, y: 1 }, l: { x: 19, y: 19 } },
+        { p: { x: 19, y: 1 }, l: { x: 1, y: 19 } },
+        { p: { x: 19, y: 19 }, l: { x: 1, y: 1 } },
+        { p: { x: 1, y: 19 }, l: { x: 19, y: 1 } }
+    ];
+
+    const selectedPair = fairPairs[Math.floor(Math.random() * fairPairs.length)];
+    player = { ...selectedPair.p };
+    ghosts = [{ ...selectedPair.l }];
+
+    stageStartTime = Date.now();
+
+    buildOffscreenMap();
+    triggerGracePeriod();
+    needsRedraw = true;
+}
+
+function drawGrassWallTile(cCtx, x, y, size) {
+    const p = size / 8;
+
+    cCtx.fillStyle = '#613615';
+    cCtx.fillRect(x, y, size, size);
+
+    cCtx.fillStyle = '#42230b';
+    cCtx.fillRect(x + p*1, y + p*4, p*2, p);
+    cCtx.fillRect(x + p*5, y + p*6, p*2, p);
+
+    cCtx.fillStyle = '#588d18';
+    cCtx.fillRect(x, y, size, p * 2.5);
+
+    cCtx.fillStyle = '#7dbb1c';
+    cCtx.fillRect(x, y, size, p * 0.8);
+
+    cCtx.strokeStyle = '#1a0d05';
+    cCtx.lineWidth = 1.2;
+    cCtx.strokeRect(x, y, size, size);
+}
+
+function isGrassFloorTile(r, c) {
+    return ((r * 7 + c * 13) % 5) > 2;
+}
+
+function drawSeamlessSandTile(cCtx, x, y, size) {
+    cCtx.fillStyle = '#c8824b';
+    cCtx.fillRect(x, y, size + 0.5, size + 0.5);
+}
+
+function drawSeamlessGrassTile(cCtx, x, y, size) {
+    cCtx.fillStyle = '#588d18';
+    cCtx.fillRect(x, y, size + 0.5, size + 0.5);
+}
+
+function drawSolidBlackExitTile(cCtx, x, y, size) {
+    cCtx.fillStyle = '#000000';
+    cCtx.fillRect(x, y, size + 0.5, size + 0.5);
+}
+
+function buildOffscreenMap() {
+    if (!offscreenCtx) return;
+    const tileSize = offscreenCanvas.width / 21;
+    offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+    for (let r = 0; r < 21; r++) {
+        for (let c = 0; c < 21; c++) {
+            const x = c * tileSize;
+            const y = r * tileSize;
+
+            if (grid[r][c] === 1) {
+                drawGrassWallTile(offscreenCtx, x, y, tileSize);
+            } else {
+                if (isGrassFloorTile(r, c)) {
+                    drawSeamlessGrassTile(offscreenCtx, x, y, tileSize);
+                } else {
+                    drawSeamlessSandTile(offscreenCtx, x, y, tileSize);
+                }
+            }
+        }
+    }
+}
+
+function renderBoard() {
+    if (!ctx) return;
+    
+    ctx.drawImage(offscreenCanvas, 0, 0);
+
+    const tileSize = canvas.width / 21;
+
+    exits.forEach(exit => {
+        drawSolidBlackExitTile(ctx, exit.x * tileSize, exit.y * tileSize, tileSize);
+    });
+
+    ctx.font = `${tileSize * 0.75}px Kanit, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ghosts.forEach(ghost => {
+        ctx.fillText("🦁", (ghost.x + 0.5) * tileSize, (ghost.y + 0.55) * tileSize);
+    });
+
+    const px = (player.x + 0.5) * tileSize;
+    const py = (player.y + 0.5) * tileSize;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px, py, tileSize * 0.45, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+    ctx.fill();
+    ctx.strokeStyle = '#facc15';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.restore();
+
+    if (zebraImg.complete && zebraImg.naturalWidth !== 0) {
+        ctx.drawImage(zebraImg, player.x * tileSize, player.y * tileSize, tileSize, tileSize);
+    } else {
+        ctx.fillText("🦓", px, py);
+    }
+}
+
+function handleKeyPress(e) {
+    if (!gameActive) return;
+    const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyS', 'KeyA', 'KeyD'];
+    if (keys.includes(e.code)) {
+        e.preventDefault(); // ป้องกันหน้าจอเลื่อนเวลาเล่นบนเบราว์เซอร์
+    }
+    
+    if (['ArrowUp', 'KeyW'].includes(e.code)) movePlayer(0, -1);
+    else if (['ArrowDown', 'KeyS'].includes(e.code)) movePlayer(0, 1);
+    else if (['ArrowLeft', 'KeyA'].includes(e.code)) movePlayer(-1, 0);
+    else if (['ArrowRight', 'KeyD'].includes(e.code)) movePlayer(1, 0);
+}
+
+function movePlayer(dx, dy) {
+    if (!gameActive) return;
+    const newX = player.x + dx;
+    const newY = player.y + dy;
+
+    if (newX < 0 || newX >= 21 || newY < 0 || newY >= 21) return;
+    if (grid[newY][newX] === 1) return;
+
+    player.x = newX;
+    player.y = newY;
+    needsRedraw = true;
+
+    if (exits.some(e => e.x === newX && e.y === newY)) {
+        gameActive = false;
+        clearAllTimers();
+        openQuizModal();
+        return;
+    }
+
+    if (ghosts.some(g => g.x === newX && g.y === newY)) {
+        handleDeathAndSwitchMap();
+        return;
+    }
+}
+
+function handleDeathAndSwitchMap() {
+    const toast = document.getElementById('death-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1200);
+
+    score = Math.max(0, score - 1);
+    document.getElementById('hud-score').innerText = score < 10 ? '0' + score : score;
+    syncMyScore();
+
+    let nextMapIndex;
+    do {
+        nextMapIndex = Math.floor(Math.random() * mazePool.length);
+    } while (nextMapIndex === currentMapIndex && mazePool.length > 1);
+
+    currentMapIndex = nextMapIndex;
+    applyMapSetup(currentMapIndex);
+    scheduleLionMove();
+}
+
+function getNextMoveBFS(start, target) {
+    if (start.x === target.x && start.y === target.y) return start;
+
+    const queue = [{ x: start.x, y: start.y }];
+    const visited = Array.from({ length: 21 }, () => Array(21).fill(false));
+    const parent = Array.from({ length: 21 }, () => Array(21).fill(null));
+    visited[start.y][start.x] = true;
+
+    let head = 0;
+    let found = false;
+
+    while (head < queue.length) {
+        const curr = queue[head++];
+
+        if (curr.x === target.x && curr.y === target.y) {
+            found = true;
+            break;
+        }
+
+        const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
+        for (let i = 0; i < 4; i++) {
+            const nx = curr.x + dirs[i].x;
+            const ny = curr.y + dirs[i].y;
+
+            if (nx >= 0 && nx < 21 && ny >= 0 && ny < 21 && grid[ny][nx] !== 1 && !visited[ny][nx]) {
+                visited[ny][nx] = true;
+                parent[ny][nx] = curr;
+                queue.push({ x: nx, y: ny });
+            }
+        }
+    }
+
+    if (!found) return start;
+
+    let curr = target;
+    while (parent[curr.y][curr.x] && (parent[curr.y][curr.x].x !== start.x || parent[curr.y][curr.x].y !== start.y)) {
+        curr = parent[curr.y][curr.x];
+    }
+
+    return curr;
+}
+
+function scheduleLionMove() {
+    if (lionTimeoutId) clearTimeout(lionTimeoutId);
+    if (!gameActive) return;
+
+    const elapsedSec = (Date.now() - stageStartTime) / 1000;
+    currentLionSpeed = Math.max(70, BASE_LION_SPEED - Math.floor(elapsedSec * 7));
+
+    lionTimeoutId = setTimeout(() => {
+        moveGhostsAI();
+        scheduleLionMove();
+    }, currentLionSpeed);
+}
+
+function moveGhostsAI() {
+    if (!gameActive || isLionFrozen) return;
+
+    ghosts.forEach(ghost => {
+        let nextStep = getNextMoveBFS(ghost, player);
+        ghost.x = nextStep.x;
+        ghost.y = nextStep.y;
+
+        if (ghost.x === player.x && ghost.y === player.y) {
+            handleDeathAndSwitchMap();
+        }
+    });
+    needsRedraw = true;
+}
+
+function openQuizModal() {
+    gameActive = false;
+    clearAllTimers();
+    const modal = document.getElementById('quiz-modal');
+    modal.classList.remove('hidden');
+
+    const currentQuizObj = shuffledQuizList[currentStage % shuffledQuizList.length];
+    document.getElementById('quiz-text').innerText = currentQuizObj.q;
+
+    const choices = currentQuizObj.a.map((opt, idx) => ({
+        text: opt,
+        isCorrect: idx === currentQuizObj.c
+    }));
+    const shuffledChoices = shuffleArray(choices);
+
+    const optionsContainer = document.getElementById('quiz-options');
+    optionsContainer.innerHTML = '';
+
+    shuffledChoices.forEach((choice) => {
+        const btn = document.createElement('button');
+        btn.innerText = choice.text;
+        btn.onclick = () => answerQuiz(choice.isCorrect);
+        optionsContainer.appendChild(btn);
+    });
+
+    quizTimeLeft = 10;
+    updateQuizTimerUI();
+
+    if (quizTimerInterval) clearInterval(quizTimerInterval);
+    quizTimerInterval = setInterval(() => {
+        quizTimeLeft--;
+        updateQuizTimerUI();
+        if (quizTimeLeft <= 0) {
+            clearInterval(quizTimerInterval);
+            answerQuiz(false);
+        }
+    }, 1000);
+}
+
+function updateQuizTimerUI() {
+    const potentialScore = quizTimeLeft * 2;
+    document.getElementById('quiz-timer-text').innerText = quizTimeLeft;
+    document.getElementById('quiz-potential-score').innerText = potentialScore > 0 ? potentialScore : 0;
+    document.getElementById('quiz-timer-bar').style.width = (quizTimeLeft / 10 * 100) + '%';
+}
+
+function answerQuiz(isCorrect) {
+    if (quizTimerInterval) clearInterval(quizTimerInterval);
+    document.getElementById('quiz-modal').classList.add('hidden');
+
+    if (isCorrect) {
+        score += quizTimeLeft * 2;
+    }
+
+    currentStage++;
+    syncMyScore();
+    loadStage(currentStage);
+}
+
+function syncMyScore() {
+    if (isHost) {
+        let myP = playersInLobby.find(p => p.id === peer.id);
+        if (myP) {
+            myP.score = score;
+            myP.stage = Math.min(currentStage + 1, 5);
+        }
+        broadcast({ type: 'LEADERBOARD_SYNC', players: playersInLobby });
+        updateLiveLeaderboard();
+        renderLeaderboard();
+    } else if (hostConn && hostConn.open) {
+        hostConn.send({
+            type: 'UPDATE_SCORE',
+            score: score,
+            stage: Math.min(currentStage + 1, 5)
+        });
+    }
+}
+
+function finishAllStages() {
+    gameActive = false;
+    clearAllTimers();
+    document.getElementById('waiting-modal').classList.remove('hidden');
+    document.getElementById('final-my-score').innerText = score;
+}
+
+function triggerGameEndTransition() {
+    gameActive = false;
+    clearAllTimers();
+    if (timerInterval) clearInterval(timerInterval); // เพิ่มโค้ดไว้ตรงนี้ เพื่อให้เวลาหยุดเฉพาะตอนจบเกมจริงๆ
+
+    document.getElementById('quiz-modal').classList.add('hidden');
+    document.getElementById('waiting-modal').classList.add('hidden');
+    document.getElementById('end-modal').classList.remove('hidden');
+
+    renderLeaderboard();
+}
+
+function renderLeaderboard() {
+    const tbody = document.getElementById('leaderboard-body');
+    if (!tbody) return;
+
+    const sorted = [...playersInLobby].sort((a, b) => b.score - a.score);
+
+    tbody.innerHTML = sorted.map((p, index) => {
+        const isMe = p.id === (peer ? peer.id : '');
+        return `<tr class="${isMe ? 'my-row' : ''}">
+            <td>${index + 1}</td>
+            <td>
+                <img src="${getAvatarUrl(p.name)}" class="table-avatar" alt="avatar">
+                ${p.name} ${isMe ? '(คุณ)' : ''}
+            </td>
+            <td>1-${p.stage}</td>
+            <td>${p.score}</td>
+        </tr>`;
+    }).join('');
+}
+</script>
+</body>
+</html>
